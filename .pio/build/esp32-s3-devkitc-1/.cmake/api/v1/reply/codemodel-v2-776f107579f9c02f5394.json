@@ -2382,7 +2382,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "EduboardV2_ESP32S3_Test1.elf::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-EduboardV2_ESP32S3_Test1.elf-fbe4b8030bbc9055038e.json",
+					"jsonFile" : "target-EduboardV2_ESP32S3_Test1.elf-adb52156483fb6a64d94.json",
 					"name" : "EduboardV2_ESP32S3_Test1.elf",
 					"projectIndex" : 0
 				},
@@ -2445,7 +2445,7 @@
 				{
 					"directoryIndex" : 128,
 					"id" : "__idf_eduboard2::@d1495cfe687f1cc6017d",
-					"jsonFile" : "target-__idf_eduboard2-f4b06fe2febed0e6dc81.json",
+					"jsonFile" : "target-__idf_eduboard2-e0da2e4c19d4327c5c33.json",
 					"name" : "__idf_eduboard2",
 					"projectIndex" : 1
 				},
@@ -2473,7 +2473,7 @@
 				{
 					"directoryIndex" : 17,
 					"id" : "__idf_esp_app_format::@08c2bdce7fd85cdbea06",
-					"jsonFile" : "target-__idf_esp_app_format-dcea1517183de222ba80.json",
+					"jsonFile" : "target-__idf_esp_app_format-799a5e436b454e4e5302.json",
 					"name" : "__idf_esp_app_format",
 					"projectIndex" : 1
 				},
@@ -2697,7 +2697,7 @@
 				{
 					"directoryIndex" : 106,
 					"id" : "__idf_esp_local_ctrl::@d6aad58d2946e56208ef",
-					"jsonFile" : "target-__idf_esp_local_ctrl-a6b963617d87002046aa.json",
+					"jsonFile" : "target-__idf_esp_local_ctrl-8fee6cdcef55219bf90a.json",
 					"name" : "__idf_esp_local_ctrl",
 					"projectIndex" : 1
 				},
@@ -3040,7 +3040,7 @@
 				{
 					"directoryIndex" : 122,
 					"id" : "__idf_wifi_provisioning::@9d7e7ffe1b15746c1098",
-					"jsonFile" : "target-__idf_wifi_provisioning-8836374226ca6c62d973.json",
+					"jsonFile" : "target-__idf_wifi_provisioning-fded175c0ca7b4b9136c.json",
 					"name" : "__idf_wifi_provisioning",
 					"projectIndex" : 1
 				},
@@ -3061,7 +3061,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "__ldgen_output_sections.ld::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-__ldgen_output_sections.ld-3e444005d833f78f5bd8.json",
+					"jsonFile" : "target-__ldgen_output_sections.ld-c3fa9041b65a5a6e3f3d.json",
 					"name" : "__ldgen_output_sections.ld",
 					"projectIndex" : 0
 				},

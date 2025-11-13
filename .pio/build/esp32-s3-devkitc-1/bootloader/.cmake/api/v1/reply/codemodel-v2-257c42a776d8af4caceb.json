@@ -622,7 +622,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "bootloader.elf::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-bootloader.elf-394b86ff9789f5f80364.json",
+					"jsonFile" : "target-bootloader.elf-cfe96d34e62e5a0c8b28.json",
 					"name" : "bootloader.elf",
 					"projectIndex" : 0
 				},

@@ -753,7 +753,7 @@
 					"path" : "C:/Users/sa061401/.platformio/packages/framework-espidf/components/esp_driver_twai/include"
 				},
 				{
-					"backtrace" : 8,
+					"backtrace" : 5,
 					"path" : "C:/EmbeddedSystems/EduboardV2_SW_ESP32S3_Pi_Berechnung/components/led_strip_encoder"
 				},
 				{
@@ -773,23 +773,23 @@
 					"path" : "C:/Users/sa061401/.platformio/packages/framework-espidf/components/esp_adc/deprecated/include"
 				},
 				{
-					"backtrace" : 9,
+					"backtrace" : 6,
 					"path" : "C:/EmbeddedSystems/EduboardV2_SW_ESP32S3_Pi_Berechnung/components/lfs"
 				},
 				{
-					"backtrace" : 6,
+					"backtrace" : 7,
 					"path" : "C:/EmbeddedSystems/EduboardV2_SW_ESP32S3_Pi_Berechnung/components/gpi2c"
 				},
 				{
-					"backtrace" : 5,
+					"backtrace" : 8,
 					"path" : "C:/EmbeddedSystems/EduboardV2_SW_ESP32S3_Pi_Berechnung/components/gpspi"
 				},
 				{
-					"backtrace" : 7,
+					"backtrace" : 9,
 					"path" : "C:/Users/sa061401/.platformio/packages/framework-espidf/components/spiffs/include"
 				},
 				{
-					"backtrace" : 7,
+					"backtrace" : 9,
 					"path" : "C:/Users/sa061401/.platformio/packages/framework-espidf/components/esp_partition/include"
 				}
 			],
@@ -825,27 +825,27 @@
 	[
 		{
 			"backtrace" : 5,
-			"id" : "__idf_gpspi::@9cec6503af993d14a34e"
+			"id" : "__idf_led_strip_encoder::@ef2339fbc221ded63ffc"
 		},
 		{
 			"backtrace" : 6,
+			"id" : "__idf_lfs::@dd2812b61f500ca6f9bc"
+		},
+		{
+			"backtrace" : 7,
 			"id" : "__idf_gpi2c::@80f803e20f6385ab0c2a"
+		},
+		{
+			"backtrace" : 8,
+			"id" : "__idf_gpspi::@9cec6503af993d14a34e"
 		},
 		{
 			"backtrace" : 2,
 			"id" : "__idf_xtensa::@1daaaad7abe597e030f9"
 		},
 		{
-			"backtrace" : 7,
-			"id" : "__idf_spiffs::@df881b71474064c86689"
-		},
-		{
-			"backtrace" : 8,
-			"id" : "__idf_led_strip_encoder::@ef2339fbc221ded63ffc"
-		},
-		{
 			"backtrace" : 9,
-			"id" : "__idf_lfs::@dd2812b61f500ca6f9bc"
+			"id" : "__idf_spiffs::@df881b71474064c86689"
 		}
 	],
 	"id" : "__idf_eduboard2::@d1495cfe687f1cc6017d",

@@ -88,7 +88,7 @@ void LeibnizTask(void *pvParameters) {
 
     while(1)
     {
-        vTaskDelay(pdMS_TO_TICKS(1));
+        vTaskDelay(pdMS_TO_TICKS(0));
         
         switch (state)
         {
@@ -141,7 +141,7 @@ void WallisTask(void *pvParameters) {
 
     while(1)
     {
-        vTaskDelay(pdMS_TO_TICKS(1));
+        vTaskDelay(pdMS_TO_TICKS(0));
 
         switch (state)
         {
@@ -284,7 +284,7 @@ void app_main()
                 "Time_Function", //Name
                 2*2048,          //Stacksize
                 NULL,            //Parameters
-                3,               //Priority
+                8,               //Priority
                 NULL);           //Taskhandle
 
 
