@@ -16,6 +16,12 @@
 #include "esp_system.h"      
 
 
+//#define configTICK_RATE_HZ 1000
+
+// Limite für die Time function
+#define Pi_low_limit 3.14159
+#define Pi_high_limit 3.14160
+
 // Zustände der State Machine
 typedef enum {
     Idle,
@@ -27,6 +33,12 @@ typedef enum {
 static volatile State_t state = Idle;
 static volatile bool Leibniz_Reset = false;
 static volatile bool Wallis_Reset = false;
+
+static volatile uint64_t Leibniz_Tick;
+static volatile uint64_t Wallis_Tick;
+static volatile bool Leibniz_fin = false;
+static volatile bool Wallis_fin = false;
+
 
 /*********************************************************************************************
  *   SteuerTask
@@ -59,6 +71,7 @@ void Steuertask(void* param) {
 
     }
 }
+
 
 /*********************************************************************************************
  *   Leibnitz Reihe
@@ -103,6 +116,7 @@ void LeibnizTask(void *pvParameters) {
                 Leibniz_sum = 0.0;
                 add = (true);
                 k = 1;
+                Leibniz_Tick = 0;
                 Leibniz_Reset = true;
             break;
             
@@ -111,6 +125,7 @@ void LeibnizTask(void *pvParameters) {
             }
     }
 }
+
 
 /*********************************************************************************************
  *   Wallissches Produkt
@@ -142,6 +157,7 @@ void WallisTask(void *pvParameters) {
                 Wallis_Pi = 0.0;
                 Wallis_prod = 1.0;
                 k = 2;
+                Wallis_Tick = 0;
                 Wallis_Reset = true;
             break;
             
@@ -157,25 +173,38 @@ void WallisTask(void *pvParameters) {
  *   Time Function
  *********************************************************************************************/
 
-
 void Time_Function(void *pvParameters) {
   (void) pvParameters;
     
-
+    uint64_t Tick_old = 0;
+    uint64_t Tick = 0;
+    uint64_t Tick_passed = 0;
+    
+    
     while(1)
     {
         vTaskDelay(pdMS_TO_TICKS(1));
 
+        Tick = xTaskGetTickCount();
+        Tick_passed = Tick - Tick_old;
+        Tick_old = Tick;
+
         switch (state)
         {
+            case Run_Leibniz:        
+                if (!((Leibniz_Pi > Pi_low_limit) &&  (Leibniz_Pi < Pi_high_limit)))
+                {
+                    Leibniz_Tick += Tick_passed;
+                }
+            break;
+
             case Run_Wallis:
-
+                if (!((Wallis_Pi > Pi_low_limit) &&  (Wallis_Pi < Pi_high_limit)))
+                {
+                    Wallis_Tick += Tick_passed;
+                }
             break;
 
-            case Run_Leibniz:
-
-            break;
-            
             default:
                 vTaskDelay(pdMS_TO_TICKS(100));
         }
@@ -197,17 +226,24 @@ void LCD_update(void* param) {
         lcdDrawString(fx32M, 10, 30, "Pi calculation", WHITE);
         
         char Pi_string[32];
+        char Time_string[32];
         //Leibnitz
         sprintf(Pi_string, "%.10f", Leibniz_Pi);
+        sprintf(Time_string, "%llu", (Leibniz_Tick/configTICK_RATE_HZ));
         lcdDrawString(fx24M, 10, 100, "Leibniz", WHITE);
-        lcdDrawString(fx24M, 200, 100, Pi_string, WHITE);
+        lcdDrawString(fx24M, 150, 100, Pi_string, WHITE);
+        lcdDrawString(fx24M, 350, 100, Time_string, WHITE);
+        lcdDrawString(fx24M, 400, 100, "sek", WHITE);
+
         //Wallis
         sprintf(Pi_string, "%.10f", Wallis_Pi);
-        lcdDrawString(fx24M, 10, 200, "Wallis", WHITE);
-        lcdDrawString(fx24M, 200, 200, Pi_string, WHITE);
+        sprintf(Time_string, "%llu", (Wallis_Tick/configTICK_RATE_HZ));
+        lcdDrawString(fx24M, 10, 150, "Wallis", WHITE);
+        lcdDrawString(fx24M, 150, 150, Pi_string, WHITE);
+        lcdDrawString(fx24M, 350, 150, Time_string, WHITE);
+        lcdDrawString(fx24M, 400, 150, "sek", WHITE);
 
         lcdUpdateVScreen();
-
     }
 }
 
