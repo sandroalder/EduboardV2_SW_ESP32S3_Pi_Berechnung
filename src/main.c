@@ -247,6 +247,8 @@ void LCD_update(void* param) {
 
         lcdDrawString(fx32M, 10, 30, "Pi calculation", WHITE);
         
+        int text_width = 0;
+
         char Pi_string[32];
         char Time_string[32];
 
@@ -257,7 +259,8 @@ void LCD_update(void* param) {
         taskEXIT_CRITICAL(&myMutex);
         lcdDrawString(fx24M, 10, 100, "Leibniz", WHITE);
         lcdDrawString(fx24M, 150, 100, Pi_string, WHITE);
-        lcdDrawString(fx24M, 350, 100, Time_string, WHITE);
+        text_width = strlen(Time_string) * 12;
+        lcdDrawString(fx24M, 390 - text_width, 100, Time_string, WHITE);
         lcdDrawString(fx24M, 400, 100, "mS", WHITE);
 
         //Wallis
@@ -267,7 +270,8 @@ void LCD_update(void* param) {
         taskEXIT_CRITICAL(&myMutex);
         lcdDrawString(fx24M, 10, 150, "Wallis", WHITE);
         lcdDrawString(fx24M, 150, 150, Pi_string, WHITE);
-        lcdDrawString(fx24M, 350, 150, Time_string, WHITE);
+        text_width = strlen(Time_string) * 12;
+        lcdDrawString(fx24M, 390 - text_width, 150, Time_string, WHITE);
         lcdDrawString(fx24M, 400, 150, "mS", WHITE);
 
         lcdUpdateVScreen();
