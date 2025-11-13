@@ -64,7 +64,7 @@ void Steuertask(void* param) {
  *   Leibnitz Reihe
  *********************************************************************************************/
 
-static double Leibniz_Pi = 0.0;
+static volatile double Leibniz_Pi = 0.0;
 
 void LeibnizTask(void *pvParameters) {
   (void) pvParameters;
@@ -75,37 +75,40 @@ void LeibnizTask(void *pvParameters) {
 
     while(1)
     {
-        if (state == Idle)
-            vTaskDelay(pdMS_TO_TICKS(100));
-
-        while (state == Run_Leibniz) {
-
         vTaskDelay(pdMS_TO_TICKS(1));
-            
-            if (add)
-            {
-                add = false;
-                Leibniz_sum += 1/(double)k;
-            }
-            else
-            {
-                add = true;
-                Leibniz_sum -= 1/(double)k;
-            }
-            k++;
-            k++;
-
-            Leibniz_Pi = Leibniz_sum*4;
-        }
-
-        if (state == Reset)
+        
+        switch (state)
         {
-            Leibniz_Pi = 0.0;
-            Leibniz_sum = 0.0;
-            add = (true);
-            k = 1;
-            Leibniz_Reset = true;
-        }
+            case Run_Leibniz:
+
+                if (add)
+                {
+                    add = false;
+                    Leibniz_sum += 1/(double)k;
+                }
+                else
+                {
+                    add = true;
+                    Leibniz_sum -= 1/(double)k;
+                }
+                k++;
+                k++;
+
+                Leibniz_Pi = Leibniz_sum*4;
+            break;
+
+            case Reset:
+            
+                Leibniz_Pi = 0.0;
+                Leibniz_sum = 0.0;
+                add = (true);
+                k = 1;
+                Leibniz_Reset = true;
+            break;
+            
+            default:
+                vTaskDelay(pdMS_TO_TICKS(100));
+            }
     }
 }
 
@@ -113,7 +116,7 @@ void LeibnizTask(void *pvParameters) {
  *   Wallissches Produkt
  *********************************************************************************************/
 
-static double Wallis_Pi = 0.0;
+static volatile double Wallis_Pi = 0.0;
 
 void WallisTask(void *pvParameters) {
   (void) pvParameters;
@@ -123,32 +126,61 @@ void WallisTask(void *pvParameters) {
 
     while(1)
     {
-        if (state == Idle)
-            vTaskDelay(pdMS_TO_TICKS(100));
-       
-        while (state == Run_Wallis) {
+        vTaskDelay(pdMS_TO_TICKS(1));
 
-            vTaskDelay(pdMS_TO_TICKS(1));
-
-            Wallis_prod *= ((double)k/ ((double)k-1)) * ((double)k/ ((double)k+1));
-            k++;
-            k++;
-            
-            Wallis_Pi = Wallis_prod*2;
-        }
-
-        if (state == Reset)
+        switch (state)
         {
-            Wallis_Pi = 0.0;
-            Wallis_prod = 1.0;
-            k = 2;
-            Wallis_Reset = true;
+            case Run_Wallis:
+                Wallis_prod *= ((double)k/ ((double)k-1)) * ((double)k/ ((double)k+1));
+                k++;
+                k++;
+                
+                Wallis_Pi = Wallis_prod*2;
+            break;
+
+            case Reset:
+                Wallis_Pi = 0.0;
+                Wallis_prod = 1.0;
+                k = 2;
+                Wallis_Reset = true;
+            break;
+            
+            default:
+                vTaskDelay(pdMS_TO_TICKS(100));
+
         }
     }
 }
 
 
- 
+ /*********************************************************************************************
+ *   Time Function
+ *********************************************************************************************/
+
+
+void Time_Function(void *pvParameters) {
+  (void) pvParameters;
+    
+
+    while(1)
+    {
+        vTaskDelay(pdMS_TO_TICKS(1));
+
+        switch (state)
+        {
+            case Run_Wallis:
+
+            break;
+
+            case Run_Leibniz:
+
+            break;
+            
+            default:
+                vTaskDelay(pdMS_TO_TICKS(100));
+        }
+    }
+}
 
 /*********************************************************************************************
  *   LCD update
@@ -167,7 +199,7 @@ void LCD_update(void* param) {
         char Pi_string[32];
         //Leibnitz
         sprintf(Pi_string, "%.10f", Leibniz_Pi);
-        lcdDrawString(fx24M, 10, 100, "Leibnitz", WHITE);
+        lcdDrawString(fx24M, 10, 100, "Leibniz", WHITE);
         lcdDrawString(fx24M, 200, 100, Pi_string, WHITE);
         //Wallis
         sprintf(Pi_string, "%.10f", Wallis_Pi);
@@ -210,6 +242,15 @@ void app_main()
                 NULL,            //Parameters
                 5,               //Priority
                 NULL);           //Taskhandle
+
+    //Create Time Function
+    xTaskCreate(Time_Function,   //Subroutine
+                "Time_Function", //Name
+                2*2048,          //Stacksize
+                NULL,            //Parameters
+                3,               //Priority
+                NULL);           //Taskhandle
+
 
     //Create LCD Update
     xTaskCreate(LCD_update,     //Subroutine

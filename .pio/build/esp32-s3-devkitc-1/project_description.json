@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "EduboardV2_ESP32S3_Test1",
-    "project_version":    "a558379-dirty",
+    "project_version":    "9dc99d6-dirty",
     "project_path":       "C:/EmbeddedSystems/EduboardV2_SW_ESP32S3_Pi_Berechnung",
     "idf_path":           "C:/Users/sa061401/.platformio/packages/framework-espidf",
     "build_dir":          "C:/EmbeddedSystems/EduboardV2_SW_ESP32S3_Pi_Berechnung/.pio/build/esp32-s3-devkitc-1",
