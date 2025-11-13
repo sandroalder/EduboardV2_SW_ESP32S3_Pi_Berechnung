@@ -15,12 +15,23 @@
 #include <stdlib.h>          
 #include "esp_system.h"      
 
-
 //#define configTICK_RATE_HZ 1000
 
 // Limite für die Time function
 #define Pi_low_limit 3.14159
 #define Pi_high_limit 3.14160
+
+// Mutex für Thread Save
+/*SemaphoreHandle_t xMutex;  
+
+xMutex = xSemaphoreCreateMutex();
+if (xSemaphoreTake(xMutex, portMAX_DELAY)) {
+    xSemaphoreGive(xMutex);
+}*/
+
+// Globale Variable für kritische Abschnitte
+portMUX_TYPE myMutex = portMUX_INITIALIZER_UNLOCKED;
+
 
 // Zustände der State Machine
 typedef enum {
@@ -29,6 +40,10 @@ typedef enum {
     Run_Wallis,
     Reset
 } State_t;
+
+
+static volatile double Leibniz_Pi = 0.0;
+static volatile double Wallis_Pi = 0.0;
 
 static volatile State_t state = Idle;
 static volatile bool Leibniz_Reset = false;
@@ -77,8 +92,6 @@ void Steuertask(void* param) {
  *   Leibnitz Reihe
  *********************************************************************************************/
 
-static volatile double Leibniz_Pi = 0.0;
-
 void LeibnizTask(void *pvParameters) {
   (void) pvParameters;
     
@@ -89,11 +102,11 @@ void LeibnizTask(void *pvParameters) {
     while(1)
     {
         vTaskDelay(pdMS_TO_TICKS(0));
-        
+       
         switch (state)
         {
             case Run_Leibniz:
-
+                taskENTER_CRITICAL(&myMutex);
                 if (add)
                 {
                     add = false;
@@ -108,21 +121,23 @@ void LeibnizTask(void *pvParameters) {
                 k++;
 
                 Leibniz_Pi = Leibniz_sum*4;
+                taskEXIT_CRITICAL(&myMutex);
             break;
 
             case Reset:
-            
+                taskENTER_CRITICAL(&myMutex);
                 Leibniz_Pi = 0.0;
                 Leibniz_sum = 0.0;
                 add = (true);
                 k = 1;
                 Leibniz_Tick = 0;
                 Leibniz_Reset = true;
+                taskEXIT_CRITICAL(&myMutex);
             break;
             
             default:
-                vTaskDelay(pdMS_TO_TICKS(100));
-            }
+                vTaskDelay(pdMS_TO_TICKS(100));   
+        }
     }
 }
 
@@ -130,8 +145,6 @@ void LeibnizTask(void *pvParameters) {
 /*********************************************************************************************
  *   Wallissches Produkt
  *********************************************************************************************/
-
-static volatile double Wallis_Pi = 0.0;
 
 void WallisTask(void *pvParameters) {
   (void) pvParameters;
@@ -143,22 +156,26 @@ void WallisTask(void *pvParameters) {
     {
         vTaskDelay(pdMS_TO_TICKS(0));
 
-        switch (state)
-        {
+            switch (state)
+            {
+
             case Run_Wallis:
+                taskENTER_CRITICAL(&myMutex);
                 Wallis_prod *= ((double)k/ ((double)k-1)) * ((double)k/ ((double)k+1));
                 k++;
                 k++;
-                
                 Wallis_Pi = Wallis_prod*2;
+                taskEXIT_CRITICAL(&myMutex);
             break;
 
             case Reset:
+                taskENTER_CRITICAL(&myMutex);
                 Wallis_Pi = 0.0;
                 Wallis_prod = 1.0;
                 k = 2;
                 Wallis_Tick = 0;
                 Wallis_Reset = true;
+                taskEXIT_CRITICAL(&myMutex);
             break;
             
             default:
@@ -185,29 +202,34 @@ void Time_Function(void *pvParameters) {
     {
         vTaskDelay(pdMS_TO_TICKS(1));
 
-        Tick = xTaskGetTickCount();
-        Tick_passed = Tick - Tick_old;
-        Tick_old = Tick;
+            Tick = xTaskGetTickCount();
+            Tick_passed = Tick - Tick_old;
+            Tick_old = Tick;
 
         switch (state)
         {
-            case Run_Leibniz:        
+            case Run_Leibniz:   
+                taskENTER_CRITICAL(&myMutex);     
                 if (!((Leibniz_Pi > Pi_low_limit) &&  (Leibniz_Pi < Pi_high_limit)))
                 {
                     Leibniz_Tick += Tick_passed;
                 }
+                taskEXIT_CRITICAL(&myMutex);
             break;
 
             case Run_Wallis:
+                taskENTER_CRITICAL(&myMutex);
                 if (!((Wallis_Pi > Pi_low_limit) &&  (Wallis_Pi < Pi_high_limit)))
                 {
                     Wallis_Tick += Tick_passed;
                 }
+                taskEXIT_CRITICAL(&myMutex);
             break;
 
             default:
                 vTaskDelay(pdMS_TO_TICKS(100));
         }
+        
     }
 }
 
@@ -220,28 +242,33 @@ void LCD_update(void* param) {
     
     while(1) {
     
-        vTaskDelay(pdMS_TO_TICKS(500));
+        vTaskDelay(pdMS_TO_TICKS(100));
         lcdFillScreen(BLACK);
 
         lcdDrawString(fx32M, 10, 30, "Pi calculation", WHITE);
         
         char Pi_string[32];
         char Time_string[32];
+
         //Leibnitz
+        taskENTER_CRITICAL(&myMutex);
         sprintf(Pi_string, "%.10f", Leibniz_Pi);
-        sprintf(Time_string, "%llu", (Leibniz_Tick/configTICK_RATE_HZ));
+        sprintf(Time_string, "%llu", (Leibniz_Tick/*configTICK_RATE_HZ*/));
+        taskEXIT_CRITICAL(&myMutex);
         lcdDrawString(fx24M, 10, 100, "Leibniz", WHITE);
         lcdDrawString(fx24M, 150, 100, Pi_string, WHITE);
         lcdDrawString(fx24M, 350, 100, Time_string, WHITE);
-        lcdDrawString(fx24M, 400, 100, "sek", WHITE);
+        lcdDrawString(fx24M, 400, 100, "mS", WHITE);
 
         //Wallis
+        taskENTER_CRITICAL(&myMutex);
         sprintf(Pi_string, "%.10f", Wallis_Pi);
-        sprintf(Time_string, "%llu", (Wallis_Tick/configTICK_RATE_HZ));
+        sprintf(Time_string, "%llu", (Wallis_Tick/*configTICK_RATE_HZ*/));
+        taskEXIT_CRITICAL(&myMutex);
         lcdDrawString(fx24M, 10, 150, "Wallis", WHITE);
         lcdDrawString(fx24M, 150, 150, Pi_string, WHITE);
         lcdDrawString(fx24M, 350, 150, Time_string, WHITE);
-        lcdDrawString(fx24M, 400, 150, "sek", WHITE);
+        lcdDrawString(fx24M, 400, 150, "mS", WHITE);
 
         lcdUpdateVScreen();
     }
